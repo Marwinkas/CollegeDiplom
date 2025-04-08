@@ -10,4 +10,9 @@ class Card extends Model
     use HasFactory;
 
     protected $fillable = ['title','author', 'imgurl', 'videourl', 'audiourl'];
+
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
+    }
 }

@@ -27,23 +27,7 @@ const mainNavItems: NavItem[] = [
         title: 'Сообщества',
         href: '/community',
         icon: LayoutGrid,
-    },
-    {
-        title: 'Музыка',
-        href: '/musics',
-        icon: LayoutGrid,
-    },
-    {
-        title: 'Видео',
-        href: '/videos',
-        icon: LayoutGrid,
-    },
-    {
-        title: 'Фото',
-        href: '/images',
-        icon: LayoutGrid,
-    },
-    
+    }, 
 ];
 
 const footerNavItems: NavItem[] = [

@@ -23,25 +23,19 @@ class MusicController extends Controller
     {
         $cards = Card::orderBy('created_at', 'desc')->get();
 
-        $cards = $cards->map(function ($card) {
-            $folderPath = public_path(parse_url($card->imgurl, PHP_URL_PATH)); // путь к папке на сервере
-
-            $files = [];
-            if (is_dir($folderPath)) {
-                $fileNames = scandir($folderPath);
-                foreach ($fileNames as $fileName) {
-                    if ($fileName !== '.' && $fileName !== '..') {
-                        $files[] = asset(parse_url($card->imgurl, PHP_URL_PATH) . '/' . $fileName);
-                    }
-                }
-            }
-
-            $card->files = $files;
-            return $card;
-        });
-
         return Inertia::render('dashboard', [
             'cards' => $cards,
+        ]);
+    }
+
+    public function cardviewer($id)
+    {
+        $card = Card::findOrFail($id);
+        $comments = $card->comments()->with('user')->latest()->get(); // получаем комментарии, отсортированные по дате
+    
+        return Inertia::render('CardPage', [
+            'card' => $card,
+            'comments' => $comments,
         ]);
     }
     // Метод для загрузки новой песни

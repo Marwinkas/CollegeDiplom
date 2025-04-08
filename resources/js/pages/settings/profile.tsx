@@ -33,7 +33,7 @@ interface ProfileProps {
 export default function Profile({ mustVerifyEmail, status }: ProfileProps) {
     const { auth } = usePage<SharedData>().props;
 
-    const { data, setData, put, errors, processing, recentlySuccessful } = useForm<ProfileForm>({
+    const { data, setData, post, errors, processing, recentlySuccessful } = useForm<ProfileForm>({
         name: auth.user.name,
         email: auth.user.email,
         photo: null,
@@ -41,12 +41,26 @@ export default function Profile({ mustVerifyEmail, status }: ProfileProps) {
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
-        
-        put(route('profile.updates'), { // Изменено с patch на put
+    
+        const formData = new FormData();
+        formData.append('name', data.name);
+        formData.append('email', data.email);
+    
+        if (data.photo) {
+            formData.append('photo', data.photo);
+        }
+    
+        // Важно: используем post + метод spoofing _method = PUT
+        formData.append('_method', 'put');
+    
+        // Отправляем данные как FormData
+        post(route('profile.updates'), {
+            data: formData,
             preserveScroll: true,
             onSuccess: () => {
                 setData('photo', null);
-            }
+            },
+            forceFormData: true,
         });
     };
     

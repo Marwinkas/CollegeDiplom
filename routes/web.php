@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CommentController;
 use App\Http\Controllers\messagecontroller;
 use App\Http\Controllers\MusicController;
 use App\Http\Controllers\VideoController;
@@ -26,12 +27,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/images', [ImageController::class, 'store'])->name('images.post');
 
     Route::get('/dashboard', [MusicController::class, 'dashboard'])->name('dashboard');
+    Route::get('/dashboard/{id}', [MusicController::class, 'cardviewer']);
     Route::post('/dashboard', [MusicController::class, 'dashstore'])->name('dashboard.post');
     
     Route::get('message', [messagecontroller::class, 'receivedMessages'])
     ->name('message');
     Route::post('/messages', [MessageController::class, 'store']);
 
+    Route::post('/comments', [CommentController::class, 'store'])->name('comments.store');
 
 });
 
