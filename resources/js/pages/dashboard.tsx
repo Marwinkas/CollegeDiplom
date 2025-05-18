@@ -1,7 +1,30 @@
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> ff866083b45f646abbd0aacb8d3ca96a9d29836d
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useInitials } from '@/hooks/use-initials';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, type SharedData } from '@/types';
+<<<<<<< HEAD
+=======
+import { Inertia } from '@inertiajs/inertia';
+import { usePage } from '@inertiajs/react';
+import Favorite from '@mui/icons-material/Favorite';
+import FavoriteBorder from '@mui/icons-material/FavoriteBorder';
+import { Card, CardActions, CardContent, Container, createTheme, CssBaseline, TextField, ThemeProvider } from '@mui/material';
+import CardHeader from '@mui/material/CardHeader';
+import Checkbox from '@mui/material/Checkbox';
+import { ChangeEvent, FormEvent, useRef, useState } from 'react';
+import { TransitionGroup } from 'react-transition-group';
+=======
+import PlayArrow from '@mui/icons-material/PlayArrow';
+import Sliders from 'react-slick';
+import Pause from '@mui/icons-material/Pause';
+import CloudUpload from '@mui/icons-material/CloudUpload';
+import MusicNote from '@mui/icons-material/MusicNote';
+import React, { useState, useRef, useEffect, ChangeEvent, FormEvent } from 'react';
+>>>>>>> ff866083b45f646abbd0aacb8d3ca96a9d29836d
 import { Inertia } from '@inertiajs/inertia';
 import MusicNoteIcon from '@mui/icons-material/MusicNote';
 import {
@@ -47,6 +70,12 @@ import BookmarkIcon from '@mui/icons-material/Bookmark';
 import { type BreadcrumbItem, type SharedData } from '@/types';
 import AppLayout from '@/layouts/app-layout';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
+<<<<<<< HEAD
+=======
+import CopyLinkButton from './Buttons'; 
+import { usePage } from '@inertiajs/react';
+>>>>>>> bffbfaa1dd0f238b3c7ba0744915a5dfe1100ad6
+>>>>>>> ff866083b45f646abbd0aacb8d3ca96a9d29836d
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Главная',
@@ -93,6 +122,21 @@ const Music: React.FC<MusicProps> = ({ cards }) => {
     const getInitials = useInitials();
     const { auth } = usePage<SharedData>().props;
 
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+    const [title, setTitle] = useState('');
+const [author, setAuthor] = useState('');
+const [photo, setPhoto] = useState('');
+const [files, setFiles] = useState<File[]>([]);
+const [searchQuery, setSearchQuery] = useState('');
+const fileInputRef = useRef<HTMLInputElement>(null);
+const fileInputRef2 = useRef<HTMLInputElement>(null);
+const fileInputRef3 = useRef<HTMLInputElement>(null);
+
+const handleAudioFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+=======
+>>>>>>> ff866083b45f646abbd0aacb8d3ca96a9d29836d
 const Music: React.FC<MusicProps> = ({ cards  }) => {
   const [title, setTitle] = useState('');
   const [author, setAuthor] = useState('');
@@ -106,6 +150,10 @@ const Music: React.FC<MusicProps> = ({ cards  }) => {
     song.author.toLowerCase().includes(searchQuery.toLowerCase())
   );
   const handleAudioFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+<<<<<<< HEAD
+=======
+>>>>>>> bffbfaa1dd0f238b3c7ba0744915a5dfe1100ad6
+>>>>>>> ff866083b45f646abbd0aacb8d3ca96a9d29836d
     if (e.target.files) {
         const selectedFiles = Array.from(e.target.files);
         setFiles(selectedFiles);
@@ -141,6 +189,7 @@ const handleUpload = async (e: FormEvent) => {
     }
 };
 
+<<<<<<< HEAD
   const settings = {
     dots: true, // показывать точки для переключения слайдов
     infinite: true, // бесконечный цикл слайдов
@@ -148,6 +197,106 @@ const handleUpload = async (e: FormEvent) => {
     slidesToShow: 1, // количество слайдов, показываемых одновременно
     slidesToScroll: 1, // количество слайдов для прокрутки
 };
+=======
+<<<<<<< HEAD
+    return (
+        <AppLayout breadcrumbs={breadcrumbs}>
+            <ThemeProvider theme={theme}>
+            <div className="m-auto mb-8 w-[100%]">
+                    <form onSubmit={handleUpload} className="space-y-4">
+                        <div>
+                            <label className="mb-1 block">Сообщение</label>
+                            <TextField
+                                type="text"
+                                value={title}
+                                onChange={(e) => setTitle(e.target.value)}
+                                className="w-full rounded border border-gray-700 bg-gray-800 p-2"
+                                multiline
+                            />
+                        </div>
+                        <div className="flex justify-between">
+                            <div className="flex gap-1">
+                                <div className="relative w-10 cursor-pointer rounded border border-gray-700 bg-gray-800 p-2">
+                                    <input
+                                        type="file"
+                                        accept="audio/*,video/*,image/*"
+                                        onChange={handleAudioFileChange}
+                                        ref={fileInputRef}
+                                        multiple
+                                        className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+                                    />
+                                    <div className="flex items-center justify-center">
+                                    
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="submit" className="w-50 rounded bg-blue-600 px-4 py-2 transition hover:bg-blue-500">
+                                Создать пост
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <CssBaseline />
+                <Container sx={{ py: 4, minHeight: '100vh', padding: 0, maxWidth: 10000 }}>
+                    <TransitionGroup className="m-0 flex w-[100%] flex-wrap gap-[24px] p-0 align-middle">
+                        {filteredSongs.map((video) => (
+                            <Card
+                                sx={{
+                                    marginBottom: '20px',
+                                    borderRadius: '15px',
+                                    width: '200px',
+                                    height: '200px',
+                                    transition: 'opacity 0.3s',
+                                    '&:hover': {
+                                        opacity: 0.8,
+                                    },
+                                }}
+                                className="bg-cover bg-center bg-no-repeat"
+                                style={{ backgroundImage: `url(${video.imgurl.split(',')[0]})` }}
+                            >
+                                <CardHeader
+                                    avatar={
+                                        <>
+                                        <Avatar className="h-8 w-8 overflow-hidden rounded-full">
+                                           <AvatarImage src={'http://127.0.0.1:8001/' + video.user.photo}/>
+                                             <AvatarFallback className="rounded-lg bg-neutral-200 text-black dark:bg-neutral-700 dark:text-white">
+                                                {getInitials(video.user.name)}
+                                            </AvatarFallback>
+                                        </Avatar>
+                                        </>
+                                    }
+                                    title={video.author}
+                                />
+                                <CardContent>
+                                    <a href={'http://127.0.0.1:8001/dashboard/' + video.id}>
+                                        <div className="min-h-11"></div>
+                                    </a>
+                                </CardContent>
+                                <CardActions disableSpacing>
+                                { auth.user &&<Checkbox checked={video.liked} onChange={async () => await handleFollowToggle2(video.id)} icon={<FavoriteBorder />} checkedIcon={<Favorite />} />}
+                                    {video.title}
+                                </CardActions>
+                            </Card>
+                        ))}
+                    </TransitionGroup>
+                </Container>
+            </ThemeProvider>
+        </AppLayout>
+    );
+=======
+const getInitials = useInitials();
+ const { auth } = usePage<SharedData>().props;
+const handleCopyLink = (url: string) => {
+  navigator.clipboard.writeText(url)
+    .then(() => {
+      console.log('Ссылка скопирована!');
+    })
+    .catch((err) => {
+      console.error('Ошибка при копировании: ', err);
+    });
+  }
+
+>>>>>>> ff866083b45f646abbd0aacb8d3ca96a9d29836d
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
     <ThemeProvider theme={theme}>
@@ -262,6 +411,10 @@ const handleUpload = async (e: FormEvent) => {
     </ThemeProvider>
     </AppLayout>
   );
+<<<<<<< HEAD
+=======
+>>>>>>> bffbfaa1dd0f238b3c7ba0744915a5dfe1100ad6
+>>>>>>> ff866083b45f646abbd0aacb8d3ca96a9d29836d
 };
 
 export default Music;
