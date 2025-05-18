@@ -28,7 +28,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/images', [ImageController::class, 'index'])->name('image');
     Route::post('/images', [ImageController::class, 'store'])->name('images.post');
 
+<<<<<<< HEAD
+=======
+    Route::get('/dashboard', [MusicController::class, 'dashboard'])->name('dashboard');
+    Route::get('/dashboard/{id}', [MusicController::class, 'cardviewer']);
+    Route::post('/dashboard', [MusicController::class, 'dashstore'])->name('dashboard.post');
+    
+    Route::get('message', [messagecontroller::class, 'receivedMessages'])
+    ->name('message');
+    Route::post('/messages', [MessageController::class, 'store']);
+>>>>>>> bffbfaa1dd0f238b3c7ba0744915a5dfe1100ad6
 
+    Route::post('/comments', [CommentController::class, 'store'])->name('comments.store');
 
     Route::post('/dashboard', [MusicController::class, 'dashstore'])->name('dashboard.post');
 

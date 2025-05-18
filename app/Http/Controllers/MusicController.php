@@ -26,6 +26,7 @@ public function dashboard()
     $cards = Card::with('user')->orderBy('created_at', 'desc')->get();
     $randomCardIds = $cards->pluck('id');
 
+<<<<<<< HEAD
     $user = Auth::user();
     $likedCardIds = [];
 
@@ -147,6 +148,23 @@ public function profileviewer($id)
         'subscribercount' => $count2
     ]);
 }
+=======
+        return Inertia::render('dashboard', [
+            'cards' => $cards,
+        ]);
+    }
+
+    public function cardviewer($id)
+    {
+        $card = Card::findOrFail($id);
+        $comments = $card->comments()->with('user')->latest()->get(); // получаем комментарии, отсортированные по дате
+    
+        return Inertia::render('CardPage', [
+            'card' => $card,
+            'comments' => $comments,
+        ]);
+    }
+>>>>>>> bffbfaa1dd0f238b3c7ba0744915a5dfe1100ad6
     // Метод для загрузки новой песни
     public function store(Request $request)
     {
