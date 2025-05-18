@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Card;
+use App\Models\Like;
 use App\Models\Songs;
+use App\Models\Subscriber;
 use App\Models\Video;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -19,31 +21,132 @@ class MusicController extends Controller
             'songs' => $songs,
         ]);
     }
-    public function dashboard()
-    {
-        $cards = Card::orderBy('created_at', 'desc')->get();
+public function dashboard()
+{
+    $cards = Card::with('user')->orderBy('created_at', 'desc')->get();
+    $randomCardIds = $cards->pluck('id');
 
-        $cards = $cards->map(function ($card) {
-            $folderPath = public_path(parse_url($card->imgurl, PHP_URL_PATH)); // путь к папке на сервере
+    $user = Auth::user();
+    $likedCardIds = [];
 
-            $files = [];
-            if (is_dir($folderPath)) {
-                $fileNames = scandir($folderPath);
-                foreach ($fileNames as $fileName) {
-                    if ($fileName !== '.' && $fileName !== '..') {
-                        $files[] = asset(parse_url($card->imgurl, PHP_URL_PATH) . '/' . $fileName);
-                    }
-                }
-            }
-
-            $card->files = $files;
-            return $card;
-        });
-
-        return Inertia::render('dashboard', [
-            'cards' => $cards,
-        ]);
+    if ($user) {
+        $likedCardIds = Like::where('user_id', $user->id)
+            ->whereIn('card_id', $randomCardIds)
+            ->pluck('card_id')
+            ->toArray();
     }
+
+    $cards->transform(function ($card) use ($likedCardIds) {
+        $card->liked = in_array($card->id, $likedCardIds);
+        return $card;
+    });
+
+    return Inertia::render('dashboard', [
+        'cards' => $cards,
+    ]);
+}
+
+public function cardviewer($id)
+{
+    $card = Card::with('user')->findOrFail($id);
+
+    $comments = $card->comments()
+        ->with('user')
+        ->latest()
+        ->get();
+
+    $user = Auth::user();
+    $userId = $user ? $user->id : null;
+
+    $recentCards = Card::where('user_id', $card->user->id)
+        ->latest()
+        ->take(5)
+        ->get();
+
+    $randomCards = Card::where('id', '!=', $card->id)
+        ->inRandomOrder()
+        ->take(56)
+        ->get();
+
+    $likedCardIds = [];
+    $like = null;
+    $subscribe = null;
+    if ($userId) {
+        $allCardIds = $recentCards->pluck('id')->merge($randomCards->pluck('id'))->unique();
+
+        $likedCardIds = Like::where('user_id', $userId)
+            ->whereIn('card_id', $allCardIds)
+            ->pluck('card_id')
+            ->toArray();
+
+        $like = Like::where('user_id', $userId)
+            ->where('card_id', $id)
+            ->first();
+
+        $subscribe = Subscriber::where('user_id', $userId)
+            ->where('target_user_id', $card->user->id)
+            ->first();
+    }
+
+    $recentCards->transform(function ($card) use ($likedCardIds) {
+        $card->liked = in_array($card->id, $likedCardIds);
+        return $card;
+    });
+
+    $randomCards->transform(function ($card) use ($likedCardIds) {
+        $card->liked = in_array($card->id, $likedCardIds);
+        return $card;
+    });
+
+    $count = Like::where('card_id', operator: $id)->count();
+     $count2 = Subscriber::where('target_user_id', $card->user->id)->count();
+    return Inertia::render('CardPage', [
+        'card' => $card,
+        'recentCards' => $recentCards,
+        'comments' => $comments,
+        'randomCards' => $randomCards,
+        'count' => $count,
+        'like' => $like,
+        'subscriber' => $subscribe,
+        'subscribercount' => $count2
+    ]);
+}
+
+
+public function profileviewer($id)
+{
+    $card = Card::with('user')->findOrFail($id);
+
+    $user = Auth::user();
+    $userId = $user ? $user->id : null;
+
+    $recentCards = Card::where('user_id', $id   )->with('user')->get();
+
+    // Получаем id карточек из recentCards и randomCards
+    $recentCardIds = $recentCards->pluck('id');
+    // Получаем лайки пользователя по всем этим карточкам
+    $likedCardIds = $userId
+        ? Like::where('user_id', $userId)
+            ->whereIn('card_id', $recentCardIds)
+            ->pluck('card_id')
+            ->toArray()
+        : [];
+
+    // Добавляем liked к recentCards
+    $recentCards->transform(function ($card) use ($likedCardIds) {
+        $card->liked = in_array($card->id, $likedCardIds);
+        return $card;
+    });
+    $subscribe = Subscriber::where('user_id', $userId)
+            ->where('target_user_id', $card->user->id)
+            ->first();
+ $count2 = Subscriber::where('target_user_id', $card->user->id)->count();
+    return Inertia::render('Profile', [
+        'recentCards' => $recentCards,
+                'subscriber' => $subscribe,
+        'subscribercount' => $count2
+    ]);
+}
     // Метод для загрузки новой песни
     public function store(Request $request)
     {
@@ -69,7 +172,7 @@ class MusicController extends Controller
             // Store the song details in the database
             Songs::create([
                 'title' => $request->input('title'),
-                'author' => Auth::user()->name,
+                'user_id' => Auth::user(),
                 'url' => $url,
             ]);
 
@@ -135,7 +238,7 @@ class MusicController extends Controller
         // Записываем URL к папке и файлам в базу данных
         Card::create([
             'title' => $request->input('title'),
-            'author' => Auth::user()->name ?? $request->input('author'),
+            'user_id' => Auth::user()->id,
             'imgurl' => implode(',', $imgUrls),   // Массив URL изображений
             'videourl' => implode(',', $videoUrls), // Массив URL видео
             'audiourl' => implode(',', $audioUrls), // Массив URL аудио
@@ -143,5 +246,54 @@ class MusicController extends Controller
 
         return Inertia::location(route('dashboard'));
     }
+    public function toggleLike($cardId)
+    {
+        $user = Auth::user();
+
+        $like = Like::where('user_id', $user->id)->where('card_id', $cardId)->first();
+
+        if ($like) {
+            $like->delete();
+            return response()->json(['liked' => false, 'likes_count' => Like::where('card_id', $cardId)->count()]);
+        } else {
+            Like::create([
+                'user_id' => $user->id,
+                'card_id' => $cardId,
+            ]);
+            return response()->json(['liked' => true, 'likes_count' => Like::where('card_id', $cardId)->count()]);
+        }
+    }
+public function toggleSubscription($targetUserId)
+{
+    
+    $user = Auth::user();
+    if (!$user) {
+        return response()->json(['error' => 'Пользователь не аутентифицирован.'], 401);
+    }
+    if ($user->id == $targetUserId) {
+        return response()->json(['error' => 'Нельзя подписаться на самого себя.'], 400);
+    }
+
+    $subscription = Subscriber::where('user_id', $user->id)
+                                ->where('target_user_id', $targetUserId)
+                                ->first();
+
+    if ($subscription) {
+        $subscription->delete();
+        return response()->json([
+            'subscribed' => false,
+            'subscribers_count' => Subscriber::where('target_user_id', $targetUserId)->count()
+        ]);
+    } else {
+        Subscriber::create([
+            'user_id' => $user->id,
+            'target_user_id' => $targetUserId,
+        ]);
+        return response()->json([
+            'subscribed' => true,
+            'subscribers_count' => Subscriber::where('target_user_id', $targetUserId)->count()
+        ]);
+    }
+}
 
 }

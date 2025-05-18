@@ -15,7 +15,7 @@ export function NavUser() {
     return (
         <SidebarMenu>
             <SidebarMenuItem>
-                <DropdownMenu>
+            {auth.user && <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <SidebarMenuButton size="lg" className="text-sidebar-accent-foreground data-[state=open]:bg-sidebar-accent group">
                             <UserInfo user={auth.user} />
@@ -29,7 +29,13 @@ export function NavUser() {
                     >
                         <UserMenuContent user={auth.user} />
                     </DropdownMenuContent>
-                </DropdownMenu>
+                </DropdownMenu>}
+                {!auth.user &&
+                <div class="flex flex-col">
+                    <a class=" w-full text-center bg-gray-800 p-2 hover:bg-gray-900"href='login' >login</a>
+                    <a class=" w-full text-center bg-gray-800 p-2 hover:bg-gray-900" href='register' >Register</a>
+                </div>
+                } 
             </SidebarMenuItem>
         </SidebarMenu>
     );

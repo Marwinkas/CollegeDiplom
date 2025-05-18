@@ -10,12 +10,12 @@ import AppLogo from './app-logo';
 const mainNavItems: NavItem[] = [
     {
         title: 'Главная',
-        href: '/dashboard',
+        href: '/',
         icon: LayoutGrid,
     },
     {
         title: 'Сообщения',
-        href: '/message',
+        href: '/message/1',
         icon: LayoutGrid,
     },
     {
@@ -23,33 +23,12 @@ const mainNavItems: NavItem[] = [
         href: '/friends',
         icon: LayoutGrid,
     },
-    {
-        title: 'Сообщества',
-        href: '/community',
-        icon: LayoutGrid,
-    },
-    {
-        title: 'Музыка',
-        href: '/musics',
-        icon: LayoutGrid,
-    },
-    {
-        title: 'Видео',
-        href: '/videos',
-        icon: LayoutGrid,
-    },
-    {
-        title: 'Фото',
-        href: '/images',
-        icon: LayoutGrid,
-    },
-    
 ];
 
 const footerNavItems: NavItem[] = [
     {
         title: 'Техподдержка',
-        href: 'https://laravel.com/docs/starter-kits',
+        href: 'https://t.me/MarwinkaChannel',
         icon: BookOpen,
     },
 ];
@@ -61,7 +40,7 @@ export function AppSidebar() {
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <SidebarMenuButton size="lg" asChild>
-                            <Link href="/dashboard" prefetch>
+                            <Link href="/" prefetch>
                                 <AppLogo />
                             </Link>
                         </SidebarMenuButton>

@@ -46,10 +46,13 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
-
     public function sentMessages()
     {
         return $this->hasMany(Message::class, 'sender_id');
+    }
+    public function videos()
+    {
+        return $this->hasMany(Video::class, 'user_id');
     }
 
     // Добавить связь для получения полученных сообщений
@@ -69,5 +72,15 @@ class User extends Authenticatable
         return $this->hasMany(Friendship::class, 'friend_id')
             ->where('status', 'pending');
     }
-
+    public function cards() {
+        return $this->hasMany(Card::class, 'user_id');
+    }
+        public function likes()
+    {
+        return $this->hasMany(Like::class);
+    }
+         public function subscribers()
+    {
+        return $this->hasMany(Subscriber::class);
+    }
 }

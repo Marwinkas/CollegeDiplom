@@ -13,9 +13,9 @@ class VideoController extends Controller
     // Метод для отображения страницы и списка песен
     public function index()
     {
-        $video = Video::orderBy('created_at', 'desc')->get();
+        $videos = Video::with('user')->orderBy('created_at', 'desc')->get();
         return Inertia::render('Video', [
-            'videos' => $video,
+            'videos' => $videos,
         ]);
     }
 
@@ -44,7 +44,7 @@ class VideoController extends Controller
             // Store the song details in the database
             Video::create([
                 'title' => $request->input('title'),
-                'author' => Auth::user()->name,
+                'user_id' => Auth::user(),
                 'url' => $url,
             ]);
         

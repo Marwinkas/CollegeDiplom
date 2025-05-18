@@ -1,23 +1,28 @@
 import React, { useState } from "react";
-import { router } from "@inertiajs/react";
+import { router, Head } from "@inertiajs/react";
 import {
   Button,
   Card,
   Typography,
   Textarea,
-  Input,
   Sheet,
   CssVarsProvider,
-  extendTheme
+  extendTheme,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemContent,
+  ListItemDecorator,
 } from '@mui/joy';
-import MessagesPane from './MessagesPane';
-import ChatsPane from './ChatsPane';
+import AppLayout from '@/layouts/app-layout';
+import { type BreadcrumbItem, type SharedData } from '@/types';
+import { Inertia } from '@inertiajs/inertia';
+import { usePage } from '@inertiajs/react';
+// Пользовательские данные и типы (пример)
 import { ChatProps } from '../types';
 import { chats } from '../data';
-import AppLayout from '@/layouts/app-layout';
-import { Head } from '@inertiajs/react';
-
-// Custom theme with black/green colors
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { useInitials } from '@/hooks/use-initials';
 const theme = extendTheme({
   colorSchemes: {
     light: {
@@ -35,37 +40,43 @@ const theme = extendTheme({
           900: '#14532d',
         },
         neutral: {
-          900: '#0a0a0a',
-          800: '#262626',
-          700: '#404040',
+          100: '#f4f4f5',
+          200: '#e4e4e7',
+          300: '#d4d4d8',
+          400: '#a1a1aa',
+          500: '#71717a',
+          600: '#52525b',
+          700: '#3f3f46',
+          800: '#27272a',
+          900: '#18181b',
         },
       },
     },
   },
 });
 
-const breadcrumbs: BreadcrumbItem[] = [
-  {
-    title: 'Dashboard',
-    href: '/dashboard',
-  },
+const breadcrumbs = [
+  { title: 'Dashboard', href: '/dashboard' },
 ];
 
-const MyProfile: React.FC<{
-  users: { id: number; name: string }[];
-  messages: { sender: { name: string }; receiver: { name: string }; content: string; created_at: string }[] | null;
-}> = ({ users, messages }) => {
-  const [receiverId, setReceiverId] = useState("");
+const MyProfile = ({
+  users,
+  messages,
+  id
+}) => {
+  const [receiverId, setReceiverId] = useState(id);
   const [content, setContent] = useState("");
   const [selectedSenderId, setSelectedSenderId] = useState("");
+  const [selectedChat, setSelectedChat] = useState(chats[0]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    router.post("/messages", { receiver_id: receiverId, content });
+    console.log(id);
+    router.post("/message/" + id, { receiver_id: receiverId, content });
     setContent("");
   };
-
-  const formatDate = (date: string) => {
+const getInitials = useInitials();
+  const formatDate = (date) => {
     const formattedDate = new Date(date);
     return formattedDate.toLocaleString("ru-RU", {
       weekday: "long",
@@ -76,9 +87,8 @@ const MyProfile: React.FC<{
       minute: "numeric",
     });
   };
-
-  const [selectedChat, setSelectedChat] = React.useState<ChatProps>(chats[0]);
-
+  const { auth } = usePage<SharedData>().props;
+  // Фильтрация сообщений по выбранному собеседнику
   const filteredMessages = selectedSenderId
     ? messages?.filter(
         (message) =>
@@ -87,146 +97,180 @@ const MyProfile: React.FC<{
       )
     : messages;
 
-  return (
-    <CssVarsProvider theme={theme}>
-      <AppLayout breadcrumbs={breadcrumbs}>
-        <Head title="Message" />
-        
+// заменяется только return (всё остальное — как в оригинале)
+return (
+  <CssVarsProvider theme={theme}>
+    <AppLayout breadcrumbs={breadcrumbs}>
+      <Head title="Сообщения" />
+
+      <Sheet sx={{
+        mx: 'auto',
+        p: 2,
+        borderRadius: 'lg',
+        boxShadow: 'lg',
+        display: 'grid',
+        gridTemplateColumns: { xs: '1fr', md: '300px 1fr',width: '100%',height:'100%' },
+        gap: 2,
+        bgcolor: 'black'
+      }}>
+        {/* Чат-лист */}
         <Sheet sx={{
-          maxWidth: 1200,
-          mx: 'auto',
-          p: 4,
-          borderRadius: 'lg',
-          boxShadow: 'md',
-          bgcolor: 'neutral.900'
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 1,
+          p: 2,
+          borderRadius: 'md',
+          boxShadow: 'sm',
+          bgcolor: '#2b2b2b',
         }}>
-          <Typography level="h2" sx={{ color: 'primary.700', mb: 4 }}>
-            Отправить сообщение
+          <Typography level="h5" sx={{ color: 'white', mb: 1 }}>
+            Диалоги
           </Typography>
-
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <Sheet sx={{ 
-              display: 'flex',
-              gap: 2,
-              flexWrap: 'wrap',
-              mb: 4,
-              p: 2,
-              borderRadius: 'md',
-              bgcolor: 'neutral.800'
-            }}>
-              <Typography sx={{ color: 'primary.200' }}>Получатель:</Typography>
-              {users.map((user) => (
-                <Button
-                  key={user.id}
-                  onClick={() => setReceiverId(user.id.toString())}
-                  variant={receiverId === user.id.toString() ? 'solid' : 'outlined'}
-                  color="primary"
-                  sx={{
-                    '&:hover': { boxShadow: '0 0 0 2px var(--joy-palette-primary-700)' }
-                  }}
-                >
-                  {user.name}
-                </Button>
-              ))}
-            </Sheet>
-
-            <Textarea
-              minRows={3}
-              placeholder="Введите сообщение"
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              required
-              sx={{
-                bgcolor: 'neutral.800',
-                borderColor: 'primary.700',
-                color: 'primary.200',
-                '&:focus-within': { borderColor: 'primary.500' }
-              }}
-            />
-
-            <Button
-              type="submit"
-              fullWidth
-              color="primary"
-              sx={{
-                bgcolor: 'primary.700',
-                '&:hover': { bgcolor: 'primary.600' }
-              }}
-            >
-              Отправить
-            </Button>
-          </form>
-
-          <Sheet sx={{ 
-            mt: 6,
-            p: 3,
-            borderRadius: 'md',
-            bgcolor: 'neutral.800'
+          <List sx={{
+            bgcolor: '#2b2b2b',
+            borderRadius: 'sm',
+            overflow: 'auto',
+            maxHeight: 920,
+            px: 0,
           }}>
-            <Typography level="h3" sx={{ color: 'primary.500', mb: 3 }}>
-              Фильтр сообщений
-            </Typography>
-            <Sheet sx={{ 
-              display: 'flex',
-              gap: 2,
-              flexWrap: 'wrap',
-              mb: 2
-            }}>
-              {users.map((user) => (
-                <Button
-                  key={user.id}
-                  onClick={() => setSelectedSenderId(user.name)}
-                  variant={selectedSenderId === user.name ? 'solid' : 'outlined'}
-                  color="primary"
-                  size="sm"
-                >
-                  {user.name}
-                </Button>
-              ))}
-            </Sheet>
-          </Sheet>
+            {users.map((user) => (
+              <a href={"http://127.0.0.1:8001/message/"+user.id}>
+              <ListItem key={user.id}>
+              <ListItemButton
+                selected={selectedSenderId === user.name}
+                onClick={() => setSelectedSenderId(user.name)}
+                sx={{
+                  borderRadius: 'md',
+                  color: "white",
+                  '&:hover': {
+                    bgcolor: '#4a4a4a', // Цвет при наведении
+                  },
+                  '&.Mui-selected': {
+                    bgcolor: '#5c5c5c',
+                    '&:hover': {
+                      bgcolor: '#4a4a4a', // Цвет при наведении, если элемент выбран
+                    },
+                  },
+                }}
+              >
+                    <Avatar className="h-11 w-11 overflow-hidden rounded-full  mr-2.5 mt-2">
+                      <AvatarImage src={"http://127.0.0.1:8001/" + user.photo} />
+                      <AvatarFallback className="rounded-lg bg-neutral-200 text-black dark:bg-neutral-700 dark:text-white">
+                      {getInitials(user.name)}
+                      </AvatarFallback>
+                    </Avatar>
+                <ListItemContent>
+                  <Typography sx={{color:"white"}}>{user.name}</Typography>
+                </ListItemContent>
+              </ListItemButton>
+            </ListItem>
+            </a>
+            ))}
+          </List>
+        </Sheet>
 
-          <Sheet sx={{ mt: 4 }}>
-            <Typography level="h3" sx={{ color: 'primary.500', mb: 3 }}>
-              Сообщения
+        {/* Основная панель */}
+        <Sheet sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          
+          bgcolor: '#1e1e1e',
+          justifyContent: 'space-between',
+          gap: 2,
+        }}>
+          {/* Сообщения */}
+          <Sheet sx={{
+            p: 2,
+            borderRadius: 'md',
+            boxShadow: 'sm',
+            bgcolor: '#1e1e1e',
+            overflowY: 'auto',
+            maxHeight: 870,
+          }}>
+            <Typography level="h5" sx={{ color: 'white', mb: 2 }}>
+              Переписка
             </Typography>
-            {Array.isArray(filteredMessages) && filteredMessages.length > 0 ? (
-              filteredMessages.map((message, index) => (
-                <Card
-                  key={index}
-                  sx={{
-                    mb: 2,
-                    bgcolor: 'neutral.800',
-                    border: '1px solid',
-                    borderColor: 'primary.700',
-                    boxShadow: 'none'
-                  }}
-                >
-                  <Sheet sx={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    mb: 1.5
-                  }}>
-                    <Typography level="body2" sx={{ color: 'primary.300' }}>
-                      От: {message.sender?.name || 'Неизвестен'}
-                    </Typography>
-                    <Typography level="body2" sx={{ color: 'primary.400' }}>
-                      {formatDate(message.created_at)}
-                    </Typography>
+            {filteredMessages && filteredMessages.length > 0 ? (
+              filteredMessages.map((message, index) => {
+                const isMe = message.sender?.id === auth.user.id;
+                return (
+                  <Sheet
+                    key={index}
+                    sx={{
+                      display: 'flex',
+                      justifyContent: isMe ? 'flex-end' : 'flex-start',
+                      bgcolor: '#1e1e1e',
+                      mb: 1,
+                    }}
+                    
+                  >
+                    <Card sx={{
+                      maxWidth: '70%',
+                      p: 1.5,
+                      bgcolor: isMe ? 'primary.500' : 'neutral.200',
+                      color: isMe ? 'white' : 'black',
+                      borderRadius: 'lg',
+                      boxShadow: 'xs',
+                    }}>
+                      <Typography level="body-sm" sx={{ mb: 0.5, color: isMe ? 'white' : 'black'}}>
+                        {isMe ? 'Вы' : message.sender?.name || 'Неизвестно'}
+                      </Typography>
+                      <Typography sx={{ color: isMe ? 'white' : 'black'}}>{message.content}</Typography>
+                      <Typography level="body-xs" sx={{ mt: 0.5, textAlign: 'right', opacity: 0.7, color: isMe ? 'white' : 'black' }}>
+                        {formatDate(message.created_at)}
+                      </Typography>
+                    </Card>
                   </Sheet>
-                  <Typography sx={{ color: 'primary.200' }}>
-                    {message.content || 'Нет содержимого'}
-                  </Typography>
-                </Card>
-              ))
+                );
+              })
             ) : (
-              <Typography sx={{ color: 'primary.300' }}>Сообщений нет</Typography>
+              <Typography sx={{ color: 'primary.500' }}>
+                Сообщений не найдено
+              </Typography>
             )}
           </Sheet>
+
+          {/* Отправка */}
+          <Sheet sx={{
+            p: 2,
+            borderRadius: 'md',
+            boxShadow: 'sm',
+            bgcolor: '#1e1e1e',
+          }}>
+            <form onSubmit={handleSubmit} style={{ display: 'flex', gap: '0.5rem' }}>
+              <Textarea
+                minRows={2}
+                placeholder="Введите сообщение..."
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                required
+                sx={{
+                  flexGrow: 1,
+                  bgcolor: '#2e2e2e',
+                  color:"white",
+                  borderColor: '#1e1e1e',
+                  '&:focus-within': { borderColor: '#1e1e1e' },
+                }}
+              />
+              <Button
+                type="submit"
+                color="primary"
+                sx={{
+                  px: 3,
+                  bgcolor: '#000000',
+                  '&:hover': { bgcolor: '#1e1e1e' },
+                }}
+              >
+                ➤
+              </Button>
+            </form>
+          </Sheet>
         </Sheet>
-      </AppLayout>
-    </CssVarsProvider>
-  );
+      </Sheet>
+    </AppLayout>
+  </CssVarsProvider>
+);
+
 };
 
 export default MyProfile;

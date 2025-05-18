@@ -9,5 +9,10 @@ class Video extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['title','author', 'url'];
+    protected $fillable = ['title','user_id', 'url'];
+
+    public function user() {
+        return $this->belongsTo(User::class);
+    }
+
 }

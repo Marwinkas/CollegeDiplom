@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Models\User;
+use App\Models\Friendship;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -15,28 +16,48 @@ use Inertia\Response;
 
 class messagecontroller extends Controller
 {
-    public function receivedMessages()
+    public function receivedMessages($id)
     {
-        $user = auth()->user();
-        $user2 = User::findOrFail(1);
-        // Получаем отправленные сообщения
-        $sentMessages = $user->sentMessages()->with(['receiver', 'sender'])->get();
+        $user2 = User::findOrFail($id)->id;
 
-        // Получаем полученные сообщения
-        $receivedMessages = $user2->receivedMessages()->with(['sender', 'receiver'])->get();
+        // Получаем отправленные и полученные сообщения с подгрузкой связей
+        $sentMessages = Auth::user()->sentMessages()
+            ->where('receiver_id', $user2)
+            ->with('sender', 'receiver')
+            ->get();
 
-        // Объединяем отправленные и полученные сообщения
-        $allMessages = $sentMessages->merge($receivedMessages);
+        $receiveMessages = Auth::user()->receivedMessages()
+            ->where('sender_id', $user2)
+            ->with('sender', 'receiver')
+            ->get();
 
-        // Сортируем сообщения по дате создания
-        $sortedMessages = $allMessages->sortBy('created_at')->values()->toArray();
+        // Объединяем и сортируем
+        $messages = $sentMessages->merge($receiveMessages)
+            ->sortBy('created_at')
+            ->values()
+            ->toArray();
+
+            $userId = Auth::id();
+
+            $friendIds = Friendship::where(function ($query) use ($userId) {
+                $query->where('user_id', $userId)
+                      ->orWhere('friend_id', $userId);
+            })
+            ->where('status', 'accepted')
+            ->get()
+            ->map(function ($friendship) use ($userId) {
+                return $friendship->user_id == $userId ? $friendship->friend_id : $friendship->user_id;
+            });
+            
+            $users = User::whereIn('id', $friendIds)->get();
         // Передаем сообщения на страницу с использованием Inertia
         return Inertia::render('message/MyMessages', [
-            'users' => User::all(),
-            'messages' => $sortedMessages,
+            'users' => $users,
+            'messages' => $messages,
+            'id' => $id
         ]);
     }
-    public function store(Request $request)
+    public function store(Request $request,$id)
     {
         // Валидируем данные
         $validated = $request->validate([
@@ -47,7 +68,7 @@ class messagecontroller extends Controller
         // Сохраняем сообщение
         $message = new Message();
         $message->sender_id = $userId; // предполагаем, что пользователь авторизован
-        $message->receiver_id = $validated['receiver_id'];
+        $message->receiver_id = $id;
         $message->content = $validated['content'];
         $message->save();
 
