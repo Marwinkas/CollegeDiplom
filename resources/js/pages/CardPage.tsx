@@ -55,17 +55,28 @@ import BookmarkIcon from '@mui/icons-material/Bookmark';
 import { type BreadcrumbItem, type SharedData } from '@/types';
 import AppLayout from '@/layouts/app-layout';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
+<<<<<<< HEAD
 import CopyLinkButton from './Buttons';
+=======
+import CopyLinkButton from './Buttons'; 
+>>>>>>> bffbfaa1dd0f238b3c7ba0744915a5dfe1100ad6
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { usePage } from '@inertiajs/react';
 import { useInitials } from '@/hooks/use-initials';
 import { useForm } from '@inertiajs/react';
 
 const breadcrumbs: BreadcrumbItem[] = [
+<<<<<<< HEAD
   {
     title: 'Главная',
     href: '/settings/profile',
   },
+=======
+    {
+        title: 'Главная',
+        href: '/settings/profile',
+    },
+>>>>>>> bffbfaa1dd0f238b3c7ba0744915a5dfe1100ad6
 ];
 interface Comment {
   id: number;
@@ -101,7 +112,10 @@ interface Song {
   id: number;
   title: string;
   author: string;
+<<<<<<< HEAD
   authorphoto: string;
+=======
+>>>>>>> bffbfaa1dd0f238b3c7ba0744915a5dfe1100ad6
   url: string;
   duration: number;
   imgurl?: string;
@@ -115,6 +129,7 @@ interface MusicProps {
   card: Song;
 }
 
+<<<<<<< HEAD
 const Music: React.FC<MusicProps> = ({ card, comments, recentCards,randomCards,count,like,subscriber,subscribercount }) => {
   const getInitials = useInitials();
    const [subscribed, setSubscribed] = useState(subscriber);
@@ -122,6 +137,11 @@ const Music: React.FC<MusicProps> = ({ card, comments, recentCards,randomCards,c
 
   const [checked, setChecked] = useState(like);
   const { auth } = usePage<SharedData>().props;
+=======
+const Music: React.FC<MusicProps> = ({ card,comments  }) => {
+  const getInitials = useInitials();
+   const { auth } = usePage<SharedData>().props;
+>>>>>>> bffbfaa1dd0f238b3c7ba0744915a5dfe1100ad6
   const [title, setTitle] = useState('');
   const [author, setAuthor] = useState('');
   const [files, setFiles] = useState<File[]>([]);
@@ -147,10 +167,17 @@ const Music: React.FC<MusicProps> = ({ card, comments, recentCards,randomCards,c
     formData.append('author', author);
     let number = 0;
     files.forEach((file, index) => {
+<<<<<<< HEAD
       formData.append(`files[${index}]`, file); // или просто `files[]`
       number += 1;
     });
     formData.append('count', number);
+=======
+        formData.append(`files[${index}]`, file); // или просто `files[]`
+        number+=1;
+      });
+      formData.append('count', number);
+>>>>>>> bffbfaa1dd0f238b3c7ba0744915a5dfe1100ad6
     try {
       await Inertia.post(route('dashboard.post'), formData);
       setTitle('');
@@ -163,6 +190,7 @@ const Music: React.FC<MusicProps> = ({ card, comments, recentCards,randomCards,c
       console.error('Upload error:', errors);
     }
   };
+<<<<<<< HEAD
   function SamplePrevArrow(props) {
     const { className, style, onClick } = props;
     return (
@@ -187,10 +215,16 @@ const handleFollowToggle3 = async (targetUserId: string) => {
 
   const settings = {
     dots: false, // показывать точки для переключения слайдов
+=======
+
+  const settings = {
+    dots: true, // показывать точки для переключения слайдов
+>>>>>>> bffbfaa1dd0f238b3c7ba0744915a5dfe1100ad6
     infinite: true, // бесконечный цикл слайдов
     speed: 500, // скорость переключения
     slidesToShow: 1, // количество слайдов, показываемых одновременно
     slidesToScroll: 1, // количество слайдов для прокрутки
+<<<<<<< HEAD
     nextArrow: <SamplePrevArrow />,
     prevArrow: <SamplePrevArrow />
   };
@@ -245,10 +279,85 @@ const handleFollowToggle3 = async (targetUserId: string) => {
                     {card.videourl && card.videourl.split(',').map((url, index) => (
                       <CardMedia
                         class="h-128 w-128 bg object-contain bg-black"
+=======
+};
+
+const { data, setData, reset, post } = useForm({
+  card_id: card.id,
+  body: '',
+});
+
+const handleCopyLink = (url: string) => {
+  navigator.clipboard.writeText(url)
+    .then(() => {
+      console.log('Ссылка скопирована!');
+    })
+    .catch((err) => {
+      console.error('Ошибка при копировании: ', err);
+    });
+  }
+
+  return (
+    <AppLayout breadcrumbs={breadcrumbs}>
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+
+        <Container maxWidth="md" sx={{ py: 4, minHeight: '100vh' }}>
+
+        {/* Список треков */}
+        <TransitionGroup>
+            <Card sx={{ maxWidth: 1000, marginBottom:"20px", borderRadius: "15px"}}>
+            <CardHeader
+              avatar={
+                <Avatar className="h-8 w-8 overflow-hidden rounded-full">
+        
+                <AvatarImage src={"http://127.0.0.1:8001/" + auth.user.photo} alt={auth.user.name} />
+                <AvatarFallback className="rounded-lg bg-neutral-200 text-black dark:bg-neutral-700 dark:text-white">
+                    {getInitials(auth.user.name)}
+                </AvatarFallback>
+              </Avatar>
+              }
+              action={
+                <IconButton aria-label="settings">
+                  <MoreVertIcon />
+                </IconButton>
+              }
+              title={card.author}
+            />
+
+            <CardContent>
+              <div class="w-[90%] m-auto">
+              <div class=" pb-4"><Typography variant="body" sx={{ color: 'text.secondary' }}>
+                {card.title}
+            </Typography></div>
+            {card.imgurl &&  card.imgurl.split(',').length > 1 && <Sliders {...settings} class = "h-128 w-128 bg object-contain">
+                {card.imgurl && card.imgurl.split(',').map((url, index) => (
+                    <CardMedia
+                        class = "h-128 w-128 bg object-contain bg-black"
+                        component="img"
+                        image={url}
+                        alt={`image-${index}`}
+                    />
+                ))}
+
+            </Sliders>}
+            
+            {card.imgurl &&  card.imgurl.split(',').length == 1 &&  <CardMedia
+                    class = "h-128 w-128 bg object-contain bg-black"
+                    component="img"
+                    image={card.imgurl}
+                    sx={{width: "100%"}}
+                />}
+            {card.videourl && card.videourl.split(',').length > 1 && <Sliders {...settings} >
+                {card.videourl && card.videourl.split(',').map((url, index) => (
+                    <CardMedia
+                        class = "h-128 w-128 bg object-contain bg-black"
+>>>>>>> bffbfaa1dd0f238b3c7ba0744915a5dfe1100ad6
                         component="card"
                         image={url}
                         controls
                         alt={`image-${index}`}
+<<<<<<< HEAD
                         sx={{ marginTop: "10px", width: "100%" }}
                       />
                     ))}
@@ -350,11 +459,46 @@ const handleFollowToggle3 = async (targetUserId: string) => {
               <Typography variant="h6" gutterBottom>Комментарии</Typography>
               
               { auth.user &&<form onSubmit={(e) => {
+=======
+                        sx={{marginTop: "10px", width: "100%"}}
+                    />
+                ))}
+            </Sliders>}
+            {card.videourl && card.videourl.split(',').length == 1 && <CardMedia
+                        class = "h-128 w-128 bg object-contain bg-black"
+                        component="card"
+                        image={card.videourl}
+                        controls
+                        sx={{marginTop: "10px"}}
+                    />}
+            {card.audiourl && card.audiourl.split(',').map((url, index) => (
+                <CardMedia
+                    component="audio"
+                    image={url}
+                    controls
+                    sx={{marginTop: "10px"}}
+                />
+            ))}
+              </div>
+ 
+            </CardContent>
+            <CardActions disableSpacing>
+              <Checkbox icon={<FavoriteBorder />} checkedIcon={<Favorite />}/>
+              <CopyLinkButton link={"http://127.0.0.1:8001/dashboard/"+ card.id} />
+              <div className='ml-auto'></div>{new Date(card.created_at).toLocaleString()}
+            </CardActions>
+              </Card>
+              <Box sx={{ mt: 2 }}>
+              <Typography variant="h6" gutterBottom>Комментарии</Typography>
+
+              <form onSubmit={(e) => {
+>>>>>>> bffbfaa1dd0f238b3c7ba0744915a5dfe1100ad6
                 e.preventDefault();
                 post(route('comments.store'), {
                   onSuccess: () => reset('body')
                 });
               }}>
+<<<<<<< HEAD
                 <Box className="flex mt-3">
                   <Avatar className="h-11 w-11 overflow-hidden rounded-full  mr-2.5 mt-2">
                     <AvatarImage src={"http://127.0.0.1:8001/" + auth.user.photo} />
@@ -432,6 +576,42 @@ const handleFollowToggle3 = async (targetUserId: string) => {
         
         
       </ThemeProvider>
+=======
+                <TextField
+                  fullWidth
+                  multiline
+                  rows={2}
+                  variant="outlined"
+                  placeholder="Оставить комментарий..."
+                  value={data.body}
+                  onChange={(e) => setData('body', e.target.value)}
+                />
+                 <input type="hidden" name="song_id" value={card.id} />
+                <Button type="submit" variant="contained" sx={{ mt: 1 }}>Отправить</Button>
+              </form>
+
+              <List>
+              {comments.map((comment) => (
+                <ListItem key={comment.id} alignItems="flex-start ">
+                    <Avatar className="h-8 w-8 overflow-hidden rounded-full  mr-2">
+        
+                      <AvatarImage src={"http://127.0.0.1:8001/" + comment.user.photo} alt={comment.user.name}/>
+                      <AvatarFallback className="rounded-lg bg-neutral-200 text-black dark:bg-neutral-700 dark:text-white">
+                          {getInitials(auth.user.name)}
+                      </AvatarFallback>
+                    </Avatar>
+                  <ListItemText
+                    primary={`${comment.user.name} • ${new Date(comment.created_at).toLocaleString()}`}
+                    secondary={comment.body}
+                  />
+                </ListItem>
+              ))}
+              </List>
+            </Box>
+        </TransitionGroup>
+      </Container>
+    </ThemeProvider>
+>>>>>>> bffbfaa1dd0f238b3c7ba0744915a5dfe1100ad6
     </AppLayout>
   );
 };
