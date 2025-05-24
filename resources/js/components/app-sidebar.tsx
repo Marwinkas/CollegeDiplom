@@ -23,14 +23,6 @@ const mainNavItems: NavItem[] = [
         href: '/friends',
         icon: LayoutGrid,
     },
-<<<<<<< HEAD
-=======
-    {
-        title: 'Сообщества',
-        href: '/community',
-        icon: LayoutGrid,
-    }, 
->>>>>>> bffbfaa1dd0f238b3c7ba0744915a5dfe1100ad6
 ];
 
 const footerNavItems: NavItem[] = [

@@ -134,7 +134,7 @@ return (
             px: 0,
           }}>
             {users.map((user) => (
-              <a href={"http://127.0.0.1:8001/message/"+user.id}>
+              <a href={"http://sonzaiigi.art/message/"+user.id}>
               <ListItem key={user.id}>
               <ListItemButton
                 selected={selectedSenderId === user.name}
@@ -154,7 +154,7 @@ return (
                 }}
               >
                     <Avatar className="h-11 w-11 overflow-hidden rounded-full  mr-2.5 mt-2">
-                      <AvatarImage src={"http://127.0.0.1:8001/" + user.photo} />
+                      <AvatarImage src={"http://sonzaiigi.art/" + user.photo} />
                       <AvatarFallback className="rounded-lg bg-neutral-200 text-black dark:bg-neutral-700 dark:text-white">
                       {getInitials(user.name)}
                       </AvatarFallback>

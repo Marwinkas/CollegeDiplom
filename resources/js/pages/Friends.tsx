@@ -66,7 +66,7 @@ export default function FriendsIndex({ friends, requests, otherUsers }: FriendsI
                 >
                   <div className="flex items-center gap-4">
                   <Avatar className="h-11 w-11 overflow-hidden rounded-full  mr-2.5 mt-2">
-                    <AvatarImage src={"http://127.0.0.1:8001/" + user.photo} />
+                    <AvatarImage src={"http://sonzaiigi.art/" + user.photo} />
                     <AvatarFallback className="rounded-lg bg-neutral-200 text-black dark:bg-neutral-700 dark:text-white">
                       {getInitials(user.name)}
                     </AvatarFallback>
@@ -111,8 +111,8 @@ export default function FriendsIndex({ friends, requests, otherUsers }: FriendsI
                 className="bg-gray-800  border rounded-2xl shadow-lg p-6 flex items-center gap-4"
               >
                 
-                <Avatar className="h-11 w-11 overflow-hidden rounded-full  mr-2.5 mt-2">
-                    <AvatarImage src={"http://127.0.0.1:8001/" + friend.photo} />
+                  <Avatar className="h-11 w-11 overflow-hidden rounded-full  mr-2.5 mt-2">
+                    <AvatarImage src={"http://sonzaiigi.art/" + friend.photo} />
                     <AvatarFallback className="rounded-lg bg-neutral-200 text-black dark:bg-neutral-700 dark:text-white">
                       {getInitials(friend.name)}
                     </AvatarFallback>

@@ -21,18 +21,49 @@ class MusicController extends Controller
             'songs' => $songs,
         ]);
     }
-public function dashboard()
+public function dashboard(Request $request)
 {
-    $cards = Card::with('user')->orderBy('created_at', 'desc')->get();
+    $search = $request->input('search');
+
+    // Основные карточки (новые)
+    $cardsQuery = Card::with('user')->orderBy('created_at', 'desc');
+
+    if ($search) {
+        $cardsQuery->where(function ($query) use ($search) {
+            $query->where('title', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%");
+        });
+    }
+
+    $cards = $cardsQuery->get();
     $randomCardIds = $cards->pluck('id');
 
-<<<<<<< HEAD
+    // Популярные карточки
+    $cards2Query = Card::with('user')->withCount('likes')
+                      ->orderByDesc('likes_count')->take(10);
+
+    if ($search) {
+        $cards2Query->where(function ($query) use ($search) {
+            $query->where('title', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%");
+        });
+    }
+
+    $cards2 = $cards2Query->get();
+    $randomCardIds2 = $cards2->pluck('id');
+
     $user = Auth::user();
     $likedCardIds = [];
+    $likedCardIds2 = [];
 
     if ($user) {
         $likedCardIds = Like::where('user_id', $user->id)
             ->whereIn('card_id', $randomCardIds)
+            ->pluck('card_id')
+            ->toArray();
+
+        $likedCardIds2 = Like::where('user_id', $user->id)
+            ->whereIn('card_id', $randomCardIds2)
             ->pluck('card_id')
             ->toArray();
     }
@@ -42,8 +73,15 @@ public function dashboard()
         return $card;
     });
 
+    $cards2->transform(function ($card2) use ($likedCardIds2) {
+        $card2->liked = in_array($card2->id, $likedCardIds2);
+        return $card2;
+    });
+
     return Inertia::render('dashboard', [
         'cards' => $cards,
+        'cards2' => $cards2,
+        'search' => $search,
     ]);
 }
 
@@ -64,7 +102,7 @@ public function cardviewer($id)
         ->take(5)
         ->get();
 
-    $randomCards = Card::where('id', '!=', $card->id)
+    $randomCards = Card::with('user')->where('id', '!=', $card->id)
         ->inRandomOrder()
         ->take(56)
         ->get();
@@ -148,23 +186,6 @@ public function profileviewer($id)
         'subscribercount' => $count2
     ]);
 }
-=======
-        return Inertia::render('dashboard', [
-            'cards' => $cards,
-        ]);
-    }
-
-    public function cardviewer($id)
-    {
-        $card = Card::findOrFail($id);
-        $comments = $card->comments()->with('user')->latest()->get(); // получаем комментарии, отсортированные по дате
-    
-        return Inertia::render('CardPage', [
-            'card' => $card,
-            'comments' => $comments,
-        ]);
-    }
->>>>>>> bffbfaa1dd0f238b3c7ba0744915a5dfe1100ad6
     // Метод для загрузки новой песни
     public function store(Request $request)
     {
@@ -278,7 +299,7 @@ public function profileviewer($id)
                 'user_id' => $user->id,
                 'card_id' => $cardId,
             ]);
-            return response()->json(['liked' => true, 'likes_count' => Like::where('card_id', $cardId)->count()]);
+            return redirect()->back();
         }
     }
 public function toggleSubscription($targetUserId)
@@ -298,19 +319,13 @@ public function toggleSubscription($targetUserId)
 
     if ($subscription) {
         $subscription->delete();
-        return response()->json([
-            'subscribed' => false,
-            'subscribers_count' => Subscriber::where('target_user_id', $targetUserId)->count()
-        ]);
+        return redirect()->back();
     } else {
         Subscriber::create([
             'user_id' => $user->id,
             'target_user_id' => $targetUserId,
         ]);
-        return response()->json([
-            'subscribed' => true,
-            'subscribers_count' => Subscriber::where('target_user_id', $targetUserId)->count()
-        ]);
+        return redirect()->back();
     }
 }
 

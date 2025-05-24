@@ -159,3 +159,15 @@
         @apply bg-background text-foreground;
     }
 }
+.outlined-text {
+  color: white; /* Цвет текста */
+  font-size: 16px;
+  text-shadow:
+    -2px -2px 0 black,
+     2px -2px 0 black,
+    -2px  2px 0 black,
+     2px  2px 0 black; /* Толщина и цвет обводки */
+     overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}

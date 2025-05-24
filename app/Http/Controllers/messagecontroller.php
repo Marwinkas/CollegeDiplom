@@ -73,6 +73,6 @@ class messagecontroller extends Controller
         $message->save();
 
         // Возвращаем успешный ответ
-        return response()->json(['message' => 'Сообщение отправлено успешно!'], 200);
+        return redirect()->back();
     }
 }

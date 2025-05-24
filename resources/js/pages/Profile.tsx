@@ -214,7 +214,7 @@ const Profile: React.FC<MusicProps> = ({ recentCards,subscriber,subscribercount}
                     <div class="flex">
                     <a href={"/profile/"+ recentCards[0].user.id} class="flex">
                     <Avatar className="h-8 w-8 overflow-hidden rounded-full">
-                    <AvatarImage src={"http://127.0.0.1:8001/" + recentCards[0].user.photo} alt={recentCards[0].user.name} />
+                    <AvatarImage src={"http://sonzaiigi.art/" + recentCards[0].user.photo} alt={recentCards[0].user.name} />
                     <AvatarFallback className="rounded-lg bg-neutral-200 text-black dark:bg-neutral-700 dark:text-white">
                       {getInitials(recentCards[0].user.name)}
                     </AvatarFallback>
@@ -230,7 +230,7 @@ const Profile: React.FC<MusicProps> = ({ recentCards,subscriber,subscribercount}
                                                   {subscribed ? "Unfollow" : "Follow"} ({subscribersCount})
                                                 </Button>}
                     </div>
-                    <div class="flex">
+                    <div class="flex flex-wrap">
                       {recentCards.map((video) => (
                         <Card
                           sx={{
@@ -248,13 +248,13 @@ const Profile: React.FC<MusicProps> = ({ recentCards,subscriber,subscribercount}
                           style={{ backgroundImage: `url(${video.imgurl.split(',')[0]})` }}
                         >
                           <CardContent className=" h-25">
-                            <a href={'http://127.0.0.1:8001/dashboard/' + video.id}>
+                            <a href={'http://sonzaiigi.art/dashboard/' + video.id}>
                               <div className="h-full"></div>
                             </a>
                           </CardContent>
                           <CardActions disableSpacing>
                              { auth.user &&<Checkbox checked={video.liked} onChange={async () => await handleFollowToggle2(video.id)} icon={<FavoriteBorder />} checkedIcon={<Favorite />} />}
-                            {video.title}
+                            <p  className="outlined-text">{video.title}</p>
                           </CardActions>
                         </Card>
                       ))}</div>
